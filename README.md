@@ -17,12 +17,12 @@ Le projet est structuré comme suit :
 ```
 ACP_Project/
 │
-├── data/                  # Dossier contenant les fichiers de données (ex. iris.arff.csv)
-├── src/                   # Code source du projet
-│   ├── acp_steps.py       # Fonctions pour normaliser les données, calculer la matrice de covariance, etc.
-│   └── main.py            # Script principal pour lancer l'application et afficher les résultats
-├── README.md              # Fichier README (ce fichier)
-└── .gitignore             # Fichier pour ignorer les fichiers temporaires et inutiles
+├── data/              # Dossier contenant les fichiers de données (ex. iris.arff.csv)
+├── utils/           
+│   ├── acp_steps.py   # Fonctions pour normaliser les données, calculer la matrice de covariance, etc.
+└── main.py            # Script principal pour lancer l'application et afficher les résultats   
+├── README.md          # Fichier README (ce fichier)
+
 ```
 ## Description des fichiers
 acp_steps.py : Ce fichier contient les fonctions nécessaires à la normalisation des données, au calcul de la matrice de covariance, aux valeurs et vecteurs propres, ainsi qu'à la projection des données sur les nouvelles composantes principales.
