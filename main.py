@@ -7,13 +7,16 @@ import matplotlib.pyplot as plt
 from utils.acp_steps import normalize_data, compute_correlation_matrix, compute_eigenvalues_eigenvectors, project_data
 
 # Charger les données
-data = pd.read_csv('data/iris.arff.csv')
-numeric_data = data[['sepallength', 'sepalwidth', 'petallength', 'petalwidth']].values
+#data = pd.read_csv('data/iris.arff.csv')
+#numeric_data = data[['sepallength', 'sepalwidth', 'petallength', 'petalwidth']].values
+
+data = pd.read_csv('data/ionosphere.arff.csv')
+numeric_data = data.loc[:, 'a1':'a34'].values
 
 # Normalisation des données
 normalized_data = normalize_data(numeric_data)
 
-# Calcul de la matrice de corrélation 
+# Calcul de la matrice de corrélation
 correlation_matrix = compute_correlation_matrix(normalized_data)
 
 # Calcul des valeurs propres et vecteurs propres
@@ -70,14 +73,36 @@ def afficher_resultats():
         message_variance = f"\nLa variance cumulée n'atteint pas 90%.\n"
         message_variance_label.config(text=message_variance, fg="red")
 
-# Fonction pour afficher la projection des données
+# Fonction pour afficher la projection des données avec des couleurs et une légende
 def afficher_projection():
-    # Visualisation des deux premières composantes principales
-    plt.scatter(projected_data[:, 0], projected_data[:, 1], c=data['class'].astype('category').cat.codes)
-    plt.xlabel('Composante principale 1')
-    plt.ylabel('Composante principale 2')
+    # Conversion des classes en codes numériques
+    class_labels = data['class'].astype('category')
+    class_codes = class_labels.cat.codes
+    class_names = class_labels.cat.categories
+    
+    # Couleurs associées à chaque classe
+    colors = ['red', 'green', 'blue']
+    
+    # Création de la figure
+    plt.figure(figsize=(8, 6))
+    
+    # Tracer les points pour chaque classe
+    for i, class_name in enumerate(class_names):
+        plt.scatter(projected_data[class_codes == i, 0], 
+                    projected_data[class_codes == i, 1], 
+                    label=class_name, 
+                    color=colors[i])
+
+    # Ajout des labels des axes avec la variance expliquée
+    plt.xlabel(f'Composante principale 1 ({explained_variance_ratio[0]:.2f}%)')
+    plt.ylabel(f'Composante principale 2 ({explained_variance_ratio[1]:.2f}%)')
+    
+    # Titre et légende
     plt.title('Projection des données (ACP)')
+    plt.legend(title="Classe")
+    plt.grid(True)
     plt.show()
+
 
 # Fonction pour afficher les données standardisées
 def afficher_donnees_standardisees():
@@ -100,7 +125,47 @@ def afficher_matrice_correlation():
     message = f"Matrice de corrélation :\n{correlation_matrix}\n"
     result_text.insert(tk.END, message)
 
-# Créer les boutons dans l'ordre souhaité
+# Fonction pour afficher le cercle de corrélation
+def afficher_cercle_correlation(correlation_matrix, eigenvectors):
+    """
+    Affiche le cercle de corrélation en utilisant la matrice de corrélation et les vecteurs propres.
+    """
+    # Nombre de variables
+    num_vars = correlation_matrix.shape[0]
+
+    # Tracer le cercle de corrélation
+    fig, ax = plt.subplots(figsize=(6, 6))
+    ax.set_aspect('equal')
+    ax.set_xlim([-1.2, 1.2])
+    ax.set_ylim([-1.2, 1.2])
+
+    # Tracer les axes (composantes principales)
+    ax.axhline(0, color='black',linewidth=0.5)
+    ax.axvline(0, color='black',linewidth=0.5)
+
+    # Tracer chaque vecteur de corrélation
+    for i in range(num_vars):
+        x = correlation_matrix[i, 0]
+        y = correlation_matrix[i, 1]
+        ax.quiver(0, 0, x, y, angles='xy', scale_units='xy', scale=1)
+
+        # Ajouter le nom de la variable à la fin du vecteur
+        ax.text(x * 1.1, y * 1.1, data.columns[i], color='blue', ha='center', va='center')
+
+    # Tracer le cercle
+    circle = plt.Circle((0, 0), 1, edgecolor='r', facecolor='none', linestyle='--')
+    ax.add_artist(circle)
+
+    # Titre et labels
+    ax.set_title("Cercle de Corrélation")
+    ax.set_xlabel('Composante principale 1')
+    ax.set_ylabel('Composante principale 2')
+
+    # Afficher le graphique
+    plt.grid(True)
+    plt.show()
+
+# Créer les boutons 
 
 # Bouton pour afficher les données standardisées
 button_donnees_standardisees = tk.Button(button_frame, text="Afficher les données standardisées", command=afficher_donnees_standardisees, font=("Helvetica", 12))
@@ -117,6 +182,10 @@ button_afficher.pack(pady=10)
 # Bouton pour afficher la projection
 button_projection = tk.Button(button_frame, text="Afficher la projection", command=afficher_projection, font=("Helvetica", 12))
 button_projection.pack(pady=10)
+
+# Bouton pour afficher le cercle de corrélation
+button_cercle_correlation = tk.Button(button_frame, text="Afficher le cercle de corrélation", command=lambda: afficher_cercle_correlation(correlation_matrix, eigenvectors), font=("Helvetica", 12))
+button_cercle_correlation.pack(pady=10)
 
 # Fonction de fermeture de l'application
 def fermer_app():
