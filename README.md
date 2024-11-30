@@ -24,6 +24,13 @@ ACP_Project/
 ├── README.md          # Fichier README (ce fichier)
 
 ```
+## Intérêt de l'ACP sur ce fichier :
+1-Réduction de dimension : Les quatre premières colonnes représentent des caractéristiques quantitatives. L'ACP permet de réduire ces quatre dimensions à deux ou trois composantes principales tout en conservant une grande partie de la variance des données.
+
+2-Visualisation : En projetant les données sur deux composantes principales, on peut visualiser les différents groupes d’espèces dans un plan 2D.
+
+3-Compréhension des relations : L'ACP met en évidence quelles caractéristiques (longueur/largeur des sépales et pétales) contribuent le plus à la variance des données.
+
 ## Description des fichiers
 acp_steps.py : Ce fichier contient les fonctions nécessaires à la normalisation des données, au calcul de la matrice de covariance, aux valeurs et vecteurs propres, ainsi qu'à la projection des données sur les nouvelles composantes principales.
 
